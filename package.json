@@ -1,0 +1,25 @@
+{
+  "name": "chariot.js",
+  "version": "0.0.1",
+  "description": "An extremely lightweight and extensible Eris client framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riyacchi/chariot.js.git"
+  },
+  "keywords": [
+    "Eris",
+    "Discord",
+    "Framework",
+    "Kirameki"
+  ],
+  "author": "Riya <kato.hana@outlook.jp>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/riyacchi/chariot.js/issues"
+  },
+  "homepage": "https://github.com/riyacchi/chariot.js#readme"
+}
