@@ -16,7 +16,7 @@ class MessageHandler {
         }
 
         try {
-            command.execute(message, this.chariot);
+            command.execute(message, commandArguments, this.chariot);
         } catch (chariotCommandExecutionError) {
             Logger.log(2, "COMMAND EXECUTION ERROR", `A command couldn't be executed because of: ${chariotCommandExecutionError}`);
         }
