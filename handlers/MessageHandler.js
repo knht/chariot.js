@@ -11,7 +11,7 @@ class MessageHandler {
         const command           = commands.get(commandName) || commands.find(chariotCommand => chariotCommand.aliases && chariotCommand.aliases.includes(commandName));
 
         if (!command) return;
-        if (command.owner && chariotOptions.chariotConfig.owner !== message.author.id) {
+        if (command.owner && this.chariot.chariotOptions.chariotConfig.owner !== message.author.id) {
             return message.channel.createMessage("Insufficient permissions!");
         }
 
