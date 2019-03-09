@@ -1,7 +1,7 @@
 <div align="middle">
     <p><img src="https://img.kirameki.one/9mAtQ3Nb.png" width="800"></p>
     <a href="https://discord.gg/kKPZdA6"><img src="https://discordapp.com/api/guilds/464440032577716238/embed.png" alt="Discord Server"/></a>
-    <a href="#"><img src="https://img.shields.io/npm/v/chariot.js.svg?color=c94e6b"></a>
+    <a href="https://www.npmjs.com/package/chariot.js"><img src="https://img.shields.io/npm/v/chariot.js.svg?color=c94e6b"></a>
      <img src="https://img.shields.io/badge/node-10.15.1-c94e6b.svg">
      <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://img.shields.io/badge/license-GPL%20v3-c94e6b.svg"></a>
 </div>
