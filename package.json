@@ -1,6 +1,6 @@
 {
   "name": "chariot.js",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "description": "An extremely lightweight and extensible Eris client framework",
   "main": "index.js",
   "scripts": {
