@@ -4,6 +4,11 @@ const Collection        = require('../helpers/Collection');
 const Logger            = require('../helpers/Logger');
 const MessageHandler    = require('../handlers/MessageHandler');
 
+/**
+ * Main class extending the actual Eris library.
+ * This class handles all the config loading, assures that all pre-conditions are met and 
+ * finally registers all valid commands in the specified command directory.
+ */
 class ChariotClient extends Eris.Client {
     constructor (chariotOptions) {
 
@@ -19,7 +24,7 @@ class ChariotClient extends Eris.Client {
             throw "You must specify a valid prefix for your bot!";
         }
 
-        if (!chariotOptions.chariotConfig.owner) {
+        if (!chariotOptions.chariotConfig.owner.length) {
             throw "You must specify a valid Discord ID for your bot owner!";
         }
 
@@ -35,15 +40,26 @@ class ChariotClient extends Eris.Client {
         this.connect();
     }
 
+    /**
+     * Adds all event listeners. This can be overwritten in the main bot file which inherits this class
+     */
     _addEventListeners() {
         this.on('ready', this._readyEmitter);
         this.on('messageCreate', this._runMessageOperators);
     }
 
+    /**
+     * Run all message operators needed off of a single event.
+     * @param {object} message The message object emitted from the Discord API 
+     */
     _runMessageOperators(message) {
         this._messageListener(message);
     }
 
+    /**
+     * Listen for messages, check if they might be valid commands and assign the due work to the MessageHandler
+     * @param {object} message The message object emitted from the Discord API 
+     */
     _messageListener(message) {
         try {
             if (!this.chariotOptions.chariotConfig.allowDMs) {
@@ -60,10 +76,20 @@ class ChariotClient extends Eris.Client {
         }
     }
 
+    /**
+     * This method is called once the bot is "ready" which means that it's 
+     * successfully logged in to Discord and is now ready to listen to events.
+     */
     _readyEmitter() {
         Logger.log(0, "CHARIOT STARTUP", "Successfully started and logged in!");
     }
 
+    /**
+     * Registering all commands within the specified command path.
+     * This method also checks for duplicate command names and ignores
+     * any file type but JavaScript files to avoid unwanted behavior due to user error.
+     * @param {string} directory The directory path of the command files. 
+     */
     _registerChariotCommands(directory) {
         this.commandFiles = read(directory).filter(file => file.endsWith('.js'));
 

@@ -1,3 +1,6 @@
+/**
+ * Really simple and pretty straight forward custom config holder
+ */
 class ChariotConfig {
     constructor(token, commandPath, chariotConfig, erisConfig) {      
         this.token = token;

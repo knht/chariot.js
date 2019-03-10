@@ -1,3 +1,6 @@
+/**
+ * Color constants for custom Rich Embeds
+ */
 module.exports = {
     DEFAULT: 0x000000,
     WHITE: 0xFFFFFF,
