@@ -1,4 +1,6 @@
 const Logger = require('../helpers/Logger');
+const Collection = require('../helpers/Collection');
+const Util = require('../helpers/Util');
 
 /**
  * This class handles the incoming messages and triggers commands if a valid command was issued
@@ -6,6 +8,8 @@ const Logger = require('../helpers/Logger');
 class MessageHandler {
     constructor(chariot) {
         this.chariot = chariot;
+        this.cooldowns = new Collection();
+        this.minimumPermissions = ['readMessages', 'sendMessages'];
     }
 
     /**
@@ -20,7 +24,25 @@ class MessageHandler {
         const commandName       = commandArguments.shift().toLowerCase();
         const command           = commands.get(commandName) || commands.find(chariotCommand => chariotCommand.aliases && chariotCommand.aliases.includes(commandName));
 
+        /* Stop handling if no command was found */
         if (!command) return;
+
+        /* Check if the bot has adequate permissions */
+        const pendingPermissions = (!command.permissions) ? this.minimumPermissions : this.minimumPermissions.concat(command.permissions);
+        let missingPermissions = [];
+
+        for (let i = 0; i < pendingPermissions.length; i++) {
+            if (!message.channel.permissionsOf(this.chariot.user.id).has(pendingPermissions[i])) {
+                missingPermissions.push(Util.formatPermission(pendingPermissions[i]));
+            }
+        }
+
+        if (missingPermissions.length) {
+            return message.channel.createMessage(`Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((error) => {
+                Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+            });
+        }
+
         if (command.owner && !this.chariot.chariotOptions.chariotConfig.owner.includes(message.author.id)) {
             return message.channel.createMessage("Insufficient permissions!");
         }
