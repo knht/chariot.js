@@ -30,7 +30,7 @@ class ChariotEmbed {
     resolveColor(color) {
         if (typeof color === 'string') {
             if (color === 'RANDOM') return Math.floor(Math.random() * (0xFFFFFF + 1));
-            color = Colors[color] || parseInt(color.replace('#', ''), 16);
+            color = Colors[color.toUpperCase()] || parseInt(color.replace('#', ''), 16);
         }
 
         return color;
