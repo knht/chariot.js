@@ -1,6 +1,7 @@
 const Logger = require('../helpers/Logger');
 const Collection = require('../helpers/Collection');
 const Util = require('../helpers/Util');
+const Embed = require('../structures/ChariotEmbed');
 
 /**
  * This class handles the incoming messages and triggers commands if a valid command was issued
@@ -38,8 +39,33 @@ class MessageHandler {
         }
 
         if (missingPermissions.length) {
-            return message.channel.createMessage(`Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((error) => {
+            console.log(missingPermissions);
+            return message.channel.createMessage(`Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((messageSendError) => {
                 Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+            });
+        }
+
+        /* Check if the user has adequate permissions */
+        const pendingUserPermissions = (!command.userPermissions) ? false : command.userPermissions;
+        let missingUserPermissions = [];
+
+        if (pendingUserPermissions) {
+            for (let j = 0; j < pendingUserPermissions.length; j++) {
+                if (!message.member.permission.has(pendingUserPermissions[j])) {
+                    missingUserPermissions.push(Util.formatPermission(pendingUserPermissions[j]));
+                }
+            }
+        }
+
+        if (missingUserPermissions.length) {
+            return message.channel.createEmbed(new Embed()
+                .setColor('RED')
+                .setTitle('Insufficient Permissions!')
+                .setDescription(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`)
+            ).catch((embedSendError) => {
+                message.channel.createMessage(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`).catch((messageSendError) => {
+                    Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                });
             });
         }
 
