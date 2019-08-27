@@ -9,6 +9,30 @@
 # About
 **Chariot.js** is an extremely lightweight, easily extensible and unopinionated [Eris](https://github.com/abalabahaha/eris) client and command framework. Chariot was made with the idea of having new bot developers experience an extremely easy entry into the wonderful world of developing bots with Eris while doing all the dirty and seemingly complex work in the background. Chariot is easily set up and features a basic, unopinionated and robust command framework. A new bot powered by Chariot can be up and running in less than 5 minutes! This makes Chariot the perfect core for simple custom bots while still being extremely performant and speedy as bots using the Eris framework are known for.
 
+# Why Chariot.js?
+You may ask yourself why you should use Chariot.js or what benefits Chariot.js comes with. Let's talk about that:
+
+### Unopinionated
+Chariot doesn't force a certain style on you. There really is nothing you have to use out of the box. You can organize, structure and build your commands and modules exactly as you intended. Chariot solely does the dirty work for you in the background, like command handling and loading, management of aliases and reserved commands for bot owners, et cetera. You can express yourself with Chariot.
+
+### Super robust command handling
+Chariot completely takes care of command handling with absurd detail. Locking the command down to owners only? Make the command only work in NSFW channels? Specify a command cooldown? Checking permissions for both users and the bot? Absolutely no problem! Chariot does all of that for you, and more!
+
+### Built in help system
+Out of the box Chariot comes with a super in-depth help system, enabling you to write super simple help messages. On top of that, Chariot ships with an optional premade help command, fully utilizing the help system! 
+
+### Native precondition testing
+Chariot allows you to separate precondition testing from actual command logic right out of the box! Need to check if a user has a certain role before running the command? No problem! Decluttering and abstracting your commands has never been so easy and robust before.
+
+### Easy Embeds
+Chariot ships with an easy Rich Embed builder which automatically parses for different passed data types, e.g. for colors (hex, string, rgb, etc.). It also comes with convenience prototypes provided by [eris-additions](https://github.com/minemidnight/eris-additions) to allow for easy embed creation with no objects.
+
+### Custom colorful Logger
+Chariot by default comes with a powerful logger providing log levels for different scenarios, custom headings and texts and an always accurate timestamp. This makes debugging your bot easy!
+
+### Out of the box message collector
+By utilizing [eris-additions](https://github.com/minemidnight/eris-additions) natively, Chariot provides a stupidly simple way of collecting messages with custom filter functions, duration periods & max matches.
+
 # Prerequisites
 In order to successfully install Chariot you must have a working compiler environment running which node-gyp can use to build needed packages from source.
 
