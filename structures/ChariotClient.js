@@ -35,6 +35,7 @@ class ChariotClient extends Eris.Client {
         this.commands = new Collection();
         this.commandFiles = [];
         this.messageHandler = new MessageHandler(this);
+        this._registerInternalCommands();
         this._registerChariotCommands(chariotOptions.commandPath);
         this._addEventListeners();
         this.connect();
@@ -63,12 +64,12 @@ class ChariotClient extends Eris.Client {
     _messageListener(message) {
         try {
             if (!this.chariotOptions.chariotConfig.allowDMs) {
-                if (message.channel.type != 0) return;
+                if (message.channel.type !== 0) return;
             }
 
             if (message.author.bot) return;
             if (!message.content.startsWith(this.prefix)) return;
-            if (message.content == this.prefix) return;
+            if (message.content === this.prefix) return;
 
             this.messageHandler.handle(message, this.commands);
         } catch (chariotListenerError) {
@@ -84,6 +85,18 @@ class ChariotClient extends Eris.Client {
         Logger.log(0, "CHARIOT STARTUP", "Successfully started and logged in!");
     }
 
+    _registerInternalCommands() {
+        if (this.chariotOptions.chariotConfig.defaultHelpCommand) {
+            const defaultHelpCommand = require('../internal/commands/ChariotHelp');
+
+            if (this.commands.find(commandName => commandName.name === defaultHelpCommand.name)) {
+                throw `Default help command couldn't be initialized because another command with the same name already exists!`;
+            }
+
+            this.commands.set(defaultHelpCommand.name, defaultHelpCommand);
+        }
+    }
+
     /**
      * Registering all commands within the specified command path.
      * This method also checks for duplicate command names and ignores
@@ -96,7 +109,7 @@ class ChariotClient extends Eris.Client {
         for (const chariotCommandFile of this.commandFiles) {
             const chariotCommand = require(`${directory}/${chariotCommandFile}`);
 
-            if (this.commands.find(commandName => commandName.name == chariotCommand.name)) {
+            if (this.commands.find(commandName => commandName.name === chariotCommand.name)) {
                 throw `A command with the name of ${chariotCommand.name} has already been registered!`;
             }
 
