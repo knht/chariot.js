@@ -117,11 +117,20 @@ class MessageHandler {
         timestamps.set(message.author.id, now);
         setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
+        const next = () => {
+            command.execute(message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
+                Logger.log(2, "COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+            });
+        }
+
         try {
-            command.execute(message, commandArguments, this.chariot)
-                .catch(chariotCommandExecutionError => {
-                    throw chariotCommandExecutionError; 
+            if (typeof command.runPreconditions === 'function') {
+                await command.runPreconditions(message, commandArguments, this.chariot, next);
+            } else {
+                command.execute(message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
+                    Logger.log(2, "COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
                 });
+            } 
         } catch (chariotCommandExecutionError) {
             Logger.log(2, "COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
         }
