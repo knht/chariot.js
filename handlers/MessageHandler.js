@@ -2,6 +2,7 @@ const Logger = require('../helpers/Logger');
 const Collection = require('../helpers/Collection');
 const Util = require('../helpers/Util');
 const Embed = require('../structures/ChariotEmbed');
+const juration = require('juration');
 
 /**
  * This class handles the incoming messages and triggers commands if a valid command was issued
@@ -69,9 +70,52 @@ class MessageHandler {
             });
         }
 
+        /* Check if the command is restricted to the bot owner */
         if (command.owner && !this.chariot.chariotOptions.chariotConfig.owner.includes(message.author.id)) {
             return message.channel.createMessage("Insufficient permissions!");
         }
+
+        /* Check if an NSFW command is only used in an NSFW channel */
+        if (command.nsfw && !message.channel.nsfw) {
+            return message.channel.createEmbed(new Embed()
+                .setColor('RED')
+                .setTitle(`Command **${command.name}** is only available in NSFW channels!`)
+            ).catch((embedSendError) => {
+                message.channel.createMessage(`Command **${command.name}** is only available in NSFW channels!`).catch((messageSendError) => {
+                    Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                });
+            });
+        }
+
+        /* Command Cooldowns */
+        if (!this.cooldowns.has(command.name)) {
+            this.cooldowns.set(command.name, new Collection());
+        }
+
+        const now = Date.now();
+        const timestamps = this.cooldowns.get(command.name);
+        const cooldownAmount = (command.cooldown || 0) * 1000;
+
+        if (timestamps.has(message.author.id)) {
+            const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+            if (now < expirationTime) {
+                const timeLeft = (expirationTime - now) / 1000;
+                const timeLeftFormatted = juration.stringify(timeLeft, { format: 'long', units: 1 });
+
+                return message.channel.createEmbed(new Embed()
+                    .setColor('BLUE')
+                    .setTitle(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`)
+                ).catch((embedSendError) => {
+                    message.channel.createMessage(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`).catch((messageSendError) => {
+                        Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                    });
+                });
+            }
+        }
+
+        timestamps.set(message.author.id, now);
+        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
         try {
             command.execute(message, commandArguments, this.chariot)
