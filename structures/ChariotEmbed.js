@@ -120,7 +120,7 @@ class ChariotEmbed {
      * @param {*} time A time resolvable, e.g. a UTC timestamp or epoch timestamps in MS  
      */
     setTimestamp(time = new Date()) {
-        this.date = time;
+        this.timestamp = time;
 
         return this;
     }
