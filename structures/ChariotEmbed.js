@@ -29,6 +29,7 @@ class ChariotEmbed {
      */
     resolveColor(color) {
         if (typeof color === 'string') {
+            if (color === 'RANDOM') return Math.floor(Math.random() * (0xFFFFFF + 1));
             color = Colors[color] || parseInt(color.replace('#', ''), 16);
         }
 
@@ -73,6 +74,14 @@ class ChariotEmbed {
         this.fields.push({ name: name.toString().substring(0, 256), value: value.toString().substring(0, 1024), inline });
 
         return this;
+    }
+
+    /**
+     * Add a blank field to the Embed
+     * @param {boolean} inline Whether this field should be inline or not 
+     */
+    addBlankField(inline = false) {
+        return this.addField('\u200B', '\u200B', inline);
     }
 
     /**
