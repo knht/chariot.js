@@ -18,10 +18,6 @@ class ChariotClient extends Eris.Client {
             throw "You must specify a valid Discord token!";
         }
 
-        if (!chariotOptions.commandPath) {
-            throw "You must specify a valid path for your command directory!";
-        }
-
         if (!chariotOptions.chariotConfig.prefix) {
             throw "You must specify a valid prefix for your bot!";
         }
