@@ -1,5 +1,7 @@
-const read              = require('fs-readdir-recursive');
-const Eris              = require("eris-additions")(require("eris"));
+const path              = require('path');
+const readdirp          = require('readdirp');
+const Eris              = require('eris-additions')(require('eris'));
+const Command           = require('../structures/ChariotCommand');
 const Collection        = require('../helpers/Collection');
 const Logger            = require('../helpers/Logger');
 const MessageHandler    = require('../handlers/MessageHandler');
@@ -36,7 +38,7 @@ class ChariotClient extends Eris.Client {
         this.commandFiles = [];
         this.messageHandler = new MessageHandler(this);
         this._registerInternalCommands();
-        this._registerChariotCommands(chariotOptions.commandPath);
+        this._registerChariotCommands();
         this._addEventListeners();
         this.connect();
     }
@@ -98,13 +100,14 @@ class ChariotClient extends Eris.Client {
     }
 
     /**
-     * Registering all commands within the specified command path.
-     * This method also checks for duplicate command names and ignores
-     * any file type but JavaScript files to avoid unwanted behavior due to user error.
-     * @param {string} directory The directory path of the command files. 
+     * Register all Chartiot commands extending the abstract Command class, no matter where commands are saved without providing any path.
+     * @async
      */
-    _registerChariotCommands(directory) {
-        this.commandFiles = read(directory).filter(file => file.endsWith('.js'));
+    async _registerChariotCommands() {
+        const directory = path.dirname(require.main.filename);
+        const readFiles = await readdirp.promise(directory, { fileFilter: '*.js', directoryFilter: ['!.git', '!*modules'] });
+        
+        this.commandFiles = readFiles.map(file => file.path);
 
         for (const chariotCommandFile of this.commandFiles) {
             const chariotCommand = require(`${directory}/${chariotCommandFile}`);
@@ -113,11 +116,12 @@ class ChariotClient extends Eris.Client {
                 throw `A command with the name of ${chariotCommand.name} has already been registered!`;
             }
 
-            this.commands.set(chariotCommand.name, chariotCommand);
+            if (chariotCommand instanceof Command) {
+                this.commands.set(chariotCommand.name, chariotCommand);
+            }
         }
 
-        const commandPlural = this.commands.size == 1 ? 'command' : 'commands';
-        Logger.log(0, "COMMANDS", `Successfully loaded ${this.commands.size} ${commandPlural}`);
+        Logger.log(0, "COMMANDS", `Successfully loaded ${this.commands.size} ${(this.commands.size === 1) ? 'command' : 'commands'}`);
     }
 }
 
