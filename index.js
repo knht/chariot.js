@@ -22,5 +22,6 @@ module.exports = {
     Logger: require('./helpers/Logger'),
     Collection: require('./helpers/Collection'),
     RichEmbed: require('./structures/ChariotEmbed'),
-    Colors: require('./structures/ChariotColors')
+    Colors: require('./structures/ChariotColors'),
+    Command: require('./structures/ChariotCommand')
 };
