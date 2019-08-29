@@ -106,10 +106,10 @@ class ChariotClient extends Eris.Client {
         this.commandFiles = readFiles.map(file => file.path);
 
         for (const chariotCommandFile of this.commandFiles) {
-            const chariotCommand = require(`${directory}/${chariotCommandFile}`);
+            const chariotCommand = require(path.join(directory, chariotCommandFile));
 
-            if (this.commands.find(commandName => commandName.name === chariotCommand.name)) {
-                throw `A command with the name of ${chariotCommand.name} has already been registered!`;
+            if (this.commands.has(chariotCommand.name)) {
+                throw new Error(`A command with the name of ${chariotCommand.name} has already been registered!`);
             }
 
             if (chariotCommand instanceof Command) {
