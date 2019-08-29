@@ -15,6 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+if (Number(process.version.slice(1).split(".")[0]) < 10) {
+    throw new Error('Node v10.0.0 or higher is required to use Chariot.js. Please update Node.js to the latest LTS version.');
+}
 
 module.exports = {
     Client: require('./structures/ChariotClient'),
