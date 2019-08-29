@@ -29,10 +29,10 @@
     "eris-additions": "^1.2.5",
     "erlpack": "github:abalabahaha/erlpack",
     "eventemitter3": "^3.1.0",
-    "fs-readdir-recursive": "^1.1.0",
     "juration": "^0.1.1",
     "node-opus": "^0.3.1",
     "pako": "^1.0.10",
+    "readdirp": "^3.1.2",
     "sodium-native": "^2.3.0",
     "uws": "^100.0.1",
     "zlib-sync": "^0.1.4"
