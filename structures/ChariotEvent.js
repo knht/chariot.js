@@ -7,14 +7,7 @@ class ChariotEvent {
      * @param {string} event A valid Eris event name! E.g. messageCreate, guildMemberAdd, etc.
      */
     constructor(event) {
-        this._checkEventValidity(event);
         this._eventName = event;
-    }
-
-    _checkEventValidity(event) {
-        const validEvents = [
-            '',
-        ];
     }
 }
 
