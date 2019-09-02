@@ -2,6 +2,7 @@ const path              = require('path');
 const readdirp          = require('readdirp');
 const Eris              = require('eris-additions')(require('eris'));
 const Command           = require('../structures/ChariotCommand');
+const Event             = require('../structures/ChariotEvent');
 const Collection        = require('../helpers/Collection');
 const Logger            = require('../helpers/Logger');
 const MessageHandler    = require('../handlers/MessageHandler');
@@ -29,12 +30,18 @@ class ChariotClient extends Eris.Client {
         super(chariotOptions.token, chariotOptions.erisConfig);
 
         this.chariotOptions = chariotOptions;
-        this.prefix = chariotOptions.chariotConfig.prefix;
-        this.commands = new Collection();
-        this.commandFiles = [];
+        this.prefix         = chariotOptions.chariotConfig.prefix;
+        
+        this.events         = new Set();
+        this.commands       = new Collection();
         this.messageHandler = new MessageHandler(this);
+
+        this.commandFiles   = [];
+        this.eventFiles     = [];
+
         this._registerInternalCommands();
         this._registerChariotCommands();
+        this._registerChariotEvents();
         this._addEventListeners();
         this.connect();
     }
@@ -93,6 +100,28 @@ class ChariotClient extends Eris.Client {
 
             this.commands.set(defaultHelpCommand.name, defaultHelpCommand);
         }
+    }
+
+    
+    async _registerChariotEvents() {
+        const directory = path.dirname(require.main.filename);
+        const readFiles = await readdirp.promise(directory, { fileFilter: '*.js', directoryFilter: ['!.git', '!*modules'] });
+
+        this.eventFiles = readFiles.map(file => file.path);
+
+        for (const chariotEventFile of this.eventFiles) {
+            const chariotEvent = require(path.join(directory, chariotEventFile));
+
+            if (chariotEvent instanceof Event) {
+                this.events.add(chariotEvent);
+            }
+        }
+
+        this.events.forEach((event) => {
+            this.on(event._eventName, event.execute);
+        });
+
+        Logger.log(0, "EVENTS", `Successfully loaded ${this.events.size} ${(this.events.size === 1) ? 'event' : 'events'}`);
     }
 
     /**
