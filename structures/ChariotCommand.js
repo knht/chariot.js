@@ -22,23 +22,6 @@ class ChartiotCommand {
 
         return result;
     }
-
-    /**
-     * Send an embed and delete it automatically after a set amount of time
-     * @async
-     * @param {object} message A message object emitted from the Discord API 
-     * @param {Chariot#Embed} embed A new Kirameki Embed
-     * @param {number} time A number in seconds when to delete the message
-     */
-    async createFlashEmbed(message, time, embed) {
-        const createdMessage = await message.channel.createEmbed(embed);
-
-        setTimeout(() => {
-            createdMessage.delete().catch((error) => {
-                this.log(this.LogLevel.ERROR, 'MESSAGE DELETE ERROR', `Couldn't delete message because of: ${error}`);
-            });
-        }, time * 1000);
-    }
 }
 
 module.exports = ChartiotCommand;
