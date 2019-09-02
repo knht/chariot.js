@@ -26,5 +26,6 @@ module.exports = {
     Collection: require('./helpers/Collection'),
     RichEmbed: require('./structures/ChariotEmbed'),
     Colors: require('./structures/ChariotColors'),
-    Command: require('./structures/ChariotCommand')
+    Command: require('./structures/ChariotCommand'),
+    Event: require('./structures/ChariotEvent')
 };
