@@ -13,7 +13,7 @@ class ChartiotCommand {
      * @param {number} count How often a string should be split by the delimeter before merging the contents
      * @returns {string[]} An array of all collected arguments
      */
-    tailedArguments() {
+    tailedArguments(string, delimeter, count) {
         const parts  = string.split(delimeter);
         const tail   = parts.slice(count).join(delimeter);
         const result = parts.slice(0, count);
