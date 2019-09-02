@@ -102,7 +102,10 @@ class ChariotClient extends Eris.Client {
         }
     }
 
-    
+     /**
+     * Register all Chariot events extending the abstract Event class, no matter where events are saved without providing any path.
+     * @async
+     */
     async _registerChariotEvents() {
         const directory = path.dirname(require.main.filename);
         const readFiles = await readdirp.promise(directory, { fileFilter: '*.js', directoryFilter: ['!.git', '!*modules'] });
@@ -125,7 +128,7 @@ class ChariotClient extends Eris.Client {
     }
 
     /**
-     * Register all Chartiot commands extending the abstract Command class, no matter where commands are saved without providing any path.
+     * Register all Chariot commands extending the abstract Command class, no matter where commands are saved without providing any path.
      * @async
      */
     async _registerChariotCommands() {
