@@ -27,5 +27,6 @@ module.exports = {
     RichEmbed: require('./structures/ChariotEmbed'),
     Colors: require('./structures/ChariotColors'),
     Command: require('./structures/ChariotCommand'),
-    Event: require('./structures/ChariotEvent')
+    Event: require('./structures/ChariotEvent'),
+    Vial: require('./structures/ChariotVial')
 };
