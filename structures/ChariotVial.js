@@ -91,16 +91,16 @@ class ChariotVial extends Map {
      */
     incorporates(probe) {
         for (const drip of this.values()) {
-			try {
-				if (probe(drip)) {
-					return true;
-				}
-			} catch (dripTypeException) {
-				continue;
-			}
-		}
+            try {
+                if (probe(drip)) {
+                    return true;
+                }
+            } catch (dripTypeException) {
+                continue;
+            }
+        }
 
-		return false;
+        return false;
     }
 
     /**
@@ -110,16 +110,16 @@ class ChariotVial extends Map {
      */
     incorporatesAll(probe) {
         for (const drip of this.values()) {
-			try {
-				if (!probe(drip)) {
-					return false;
-				}
-			} catch (dripTypeException) {
-				continue;
-			}
-		}
+            try {
+                if (!probe(drip)) {
+                    return false;
+                }
+            } catch (dripTypeException) {
+                continue;
+            }
+        }
 
-		return true;
+        return true;
     }
 
     /**
