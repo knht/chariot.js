@@ -36,7 +36,7 @@ class ChariotVial extends Map {
      * If an object gets provided of which the Snowflake is already present in the Vial, the object will be stored nevertheless and gets a v4 UUID assigned!
      * 
      * @param {...*} anything Anything that needs to be stored inside the Vial. Can be as many arguments as needed
-     * @returns {string | Array<*>} The object's Snowflake OR a randomly generated v4 UUID if no object with a Snowflake ID was provided if a single item was provided or an array containing all Snowflakes / UUIDs of all items
+     * @returns {string | Array<string>} The object's Snowflake OR a randomly generated v4 UUID if no object with a Snowflake ID was provided if a single item was provided or an array containing all Snowflakes / UUIDs of all items
      */
     pourIn(...anything) {
         const identifiers = [];
