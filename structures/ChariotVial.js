@@ -1,7 +1,7 @@
 const Util = require('../helpers/Util');
 
 /**
- * Store any data indefinitely and reliably with additional utility methods 
+ * Store any data indefinitely and reliably with additional utility methods.
  */
 class ChariotVial extends Map {
     constructor() {
