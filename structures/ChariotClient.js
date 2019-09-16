@@ -78,7 +78,7 @@ class ChariotClient extends Eris.Client {
 
             this.messageHandler.handle(message, this.commands);
         } catch (chariotListenerError) {
-            Logger.log(2, "CHARIOT ERROR", `Handling a message failed because of: ${chariotListenerError}`);
+            Logger.error("CHARIOT ERROR", `Handling a message failed because of: ${chariotListenerError}`);
         }
     }
 
@@ -87,7 +87,7 @@ class ChariotClient extends Eris.Client {
      * successfully logged in to Discord and is now ready to listen to events.
      */
     _readyEmitter() {
-        Logger.log(0, "CHARIOT STARTUP", "Successfully started and logged in!");
+        Logger.success("CHARIOT STARTUP", "Successfully started and logged in!");
     }
 
     _registerInternalCommands() {
@@ -124,7 +124,7 @@ class ChariotClient extends Eris.Client {
             this.on(event._eventName, event.execute);
         });
 
-        Logger.log(0, "EVENTS", `Successfully loaded ${this.events.size} ${(this.events.size === 1) ? 'event' : 'events'}`);
+        Logger.success("EVENTS", `Successfully loaded ${this.events.size} ${(this.events.size === 1) ? 'event' : 'events'}`);
     }
 
     /**
@@ -149,7 +149,7 @@ class ChariotClient extends Eris.Client {
             }
         }
 
-        Logger.log(0, "COMMANDS", `Successfully loaded ${this.commands.size} ${(this.commands.size === 1) ? 'command' : 'commands'}`);
+        Logger.success("COMMANDS", `Successfully loaded ${this.commands.size} ${(this.commands.size === 1) ? 'command' : 'commands'}`);
     }
 }
 

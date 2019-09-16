@@ -42,7 +42,7 @@ class MessageHandler {
         if (missingPermissions.length) {
             console.log(missingPermissions);
             return message.channel.createMessage(`Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((messageSendError) => {
-                Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
             });
         }
 
@@ -65,7 +65,7 @@ class MessageHandler {
                 .setDescription(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`)
             ).catch((embedSendError) => {
                 message.channel.createMessage(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`).catch((messageSendError) => {
-                    Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                    Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                 });
             });
         }
@@ -82,7 +82,7 @@ class MessageHandler {
                 .setTitle(`Command **${command.name}** is only available in NSFW channels!`)
             ).catch((embedSendError) => {
                 message.channel.createMessage(`Command **${command.name}** is only available in NSFW channels!`).catch((messageSendError) => {
-                    Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                    Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                 });
             });
         }
@@ -108,7 +108,7 @@ class MessageHandler {
                     .setTitle(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`)
                 ).catch((embedSendError) => {
                     message.channel.createMessage(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`).catch((messageSendError) => {
-                        Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                        Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                     });
                 });
             }
@@ -119,7 +119,7 @@ class MessageHandler {
 
         const next = () => {
             command.execute(message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
-                Logger.log(2, "COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+                Logger.error("COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
             });
         }
 
@@ -128,11 +128,11 @@ class MessageHandler {
                 await command.runPreconditions(message, commandArguments, this.chariot, next);
             } else {
                 command.execute(message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
-                    Logger.log(2, "COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+                    Logger.error("COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
                 });
             } 
         } catch (chariotCommandExecutionError) {
-            Logger.log(2, "COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+            Logger.error("COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
         }
     }
 }

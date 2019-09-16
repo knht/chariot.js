@@ -69,7 +69,7 @@ class ChariotHelp {
             }
 
             message.channel.createEmbed(helpEmbed);
-            Logger.log(0, 'HELP', `${message.author.username}#${message.author.discriminator} (${message.author.id}) used the help command for command ${foundCommand.name}.`);
+            Logger.success('HELP', `${message.author.username}#${message.author.discriminator} (${message.author.id}) used the help command for command ${foundCommand.name}.`);
         }
     }
 }
