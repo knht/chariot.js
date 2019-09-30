@@ -2,10 +2,21 @@ const Util = require('../helpers/Util');
 
 /**
  * Store any data indefinitely and reliably with additional utility methods.
+ * @extends Map 
+ * @property {Array<*>} first Get the first item of this Vial
+ * @property {Array<*>} last Get the last item of this Vial
  */
 class ChariotVial extends Map {
     constructor() {
         super();
+    }
+
+    get first() {
+        return (this.size !== 0) ? this.entries().next().value : null;
+    }
+
+    get last() {
+        return (this.size !== 0) ? Array.from(this)[this.size - 1] : null;
     }
 
     /**
