@@ -115,6 +115,8 @@ class ChariotClient extends Eris.Client {
         for (const chariotEventFile of this.eventFiles) {
             const chariotEvent = require(path.join(directory, chariotEventFile));
 
+            chariotEvent.client = this;
+
             if (chariotEvent instanceof Event) {
                 this.events.add(chariotEvent);
             }
