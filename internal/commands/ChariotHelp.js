@@ -15,10 +15,13 @@ class ChariotHelp {
 
     async execute(message, args, chariot) {
         if (!args[0]) {
+            const commandNames = chariot.commands.filter((cmnds) => !cmnds.owner).map((cmnds) => '`' + cmnds.name + '`');
+
             return message.channel.createEmbed(new Embed()
                 .setColor(chariot.chariotOptions.chariotConfig.primaryColor || 'RANDOM')
                 .setTitle('Command Help')
                 .setDescription(`Get detailed command instructions for any command!\n You can specify a certain command by writing \`${chariot.chariotOptions.chariotConfig.prefix}help <commandName>\`!`)
+                .addField('Commands', commandNames.join(', '))
             );
         } else {
             const foundCommand = chariot.commands.get(args[0]) || chariot.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(args[0]));
