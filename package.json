@@ -29,7 +29,6 @@
     "eris-additions": "^1.2.5",
     "juration": "^0.1.1",
     "node-opus": "^0.3.1",
-    "pako": "^1.0.10",
     "readdirp": "^3.1.2",
     "sodium-native": "^2.3.0",
     "zlib-sync": "^0.1.4"
