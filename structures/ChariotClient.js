@@ -118,7 +118,11 @@ class ChariotClient extends Eris.Client {
             chariotEvent.client = this;
 
             if (chariotEvent instanceof Event) {
-                this.events.add(chariotEvent);
+                if (typeof chariotEvent.execute === 'undefined') {
+                    throw new Error(`Couldn't find main executor "execute" in event file "${chariotEventFile}"!`);
+                } else {
+                    this.events.add(chariotEvent);
+                }
             }
         }
 
