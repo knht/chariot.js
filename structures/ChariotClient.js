@@ -6,6 +6,7 @@ const Event             = require('../structures/ChariotEvent');
 const Collection        = require('../helpers/Collection');
 const Logger            = require('../helpers/Logger');
 const MessageHandler    = require('../handlers/MessageHandler');
+const Constants         = require('../constants/General');
 
 /**
  * Main class extending the actual Eris library.
@@ -118,11 +119,15 @@ class ChariotClient extends Eris.Client {
             chariotEvent.client = this;
 
             if (chariotEvent instanceof Event) {
+                if (!Constants.EVENTS.EVENT_NAMES.includes(chariotEvent._eventName)) {
+                    throw new Error(`Unknown event called "${chariotEvent._eventName}" in file "${chariotEventFile}". Event names are case sensitive! Check https://abal.moe/Eris/docs/Client for an event overview.`)
+                }
+
                 if (typeof chariotEvent.execute === 'undefined') {
                     throw new Error(`Couldn't find main executor "execute" in event file "${chariotEventFile}"!`);
-                } else {
-                    this.events.add(chariotEvent);
                 }
+
+                this.events.add(chariotEvent);
             }
         }
 
