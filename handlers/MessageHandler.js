@@ -128,6 +128,10 @@ class MessageHandler {
                         if (typeof command[command.subcommands[i]] !== 'function') {
                             throw new Error(`Specified subcommand "${command.subcommands[i]}" has no invokable method inside command class "${command.name}"! You can fix this by adding this method to your command class: async ${command.subcommands[i]}(message, args, chariot) {}`);
                         }
+
+                        if (command.subcommands[i].toLowerCase() === 'execute') {
+                            throw new Error('The main command executor "execute" cannot be overwritten!');
+                        }
                     }
 
                     if (command.subcommands.includes(commandArguments[0].toLowerCase()) && typeof command[commandArguments[0].toLowerCase()] === 'function') {
