@@ -3,7 +3,7 @@
  */
 class ChariotEvent {
     /**
-     * Instantiate a new Chartio.js Event 
+     * Instantiate a new Chariot.js Event 
      * @param {string} event A valid Eris event name! E.g. messageCreate, guildMemberAdd, etc.
      */
     constructor(event) {
