@@ -1,8 +1,12 @@
-const read              = require('fs-readdir-recursive');
-const Eris              = require("eris-additions")(require("eris"));
+const path              = require('path');
+const readdirp          = require('readdirp');
+const Eris              = require('eris-additions')(require('eris'));
+const Command           = require('../structures/ChariotCommand');
+const Event             = require('../structures/ChariotEvent');
 const Collection        = require('../helpers/Collection');
 const Logger            = require('../helpers/Logger');
 const MessageHandler    = require('../handlers/MessageHandler');
+const Constants         = require('../constants/General');
 
 /**
  * Main class extending the actual Eris library.
@@ -16,10 +20,6 @@ class ChariotClient extends Eris.Client {
             throw "You must specify a valid Discord token!";
         }
 
-        if (!chariotOptions.commandPath) {
-            throw "You must specify a valid path for your command directory!";
-        }
-
         if (!chariotOptions.chariotConfig.prefix) {
             throw "You must specify a valid prefix for your bot!";
         }
@@ -31,12 +31,18 @@ class ChariotClient extends Eris.Client {
         super(chariotOptions.token, chariotOptions.erisConfig);
 
         this.chariotOptions = chariotOptions;
-        this.prefix = chariotOptions.chariotConfig.prefix;
-        this.commands = new Collection();
-        this.commandFiles = [];
+        this.prefix         = chariotOptions.chariotConfig.prefix;
+        
+        this.events         = new Set();
+        this.commands       = new Collection();
         this.messageHandler = new MessageHandler(this);
+
+        this.commandFiles   = [];
+        this.eventFiles     = [];
+
         this._registerInternalCommands();
-        this._registerChariotCommands(chariotOptions.commandPath);
+        this._registerChariotCommands();
+        this._registerChariotEvents();
         this._addEventListeners();
         this.connect();
     }
@@ -73,7 +79,7 @@ class ChariotClient extends Eris.Client {
 
             this.messageHandler.handle(message, this.commands);
         } catch (chariotListenerError) {
-            Logger.log(2, "CHARIOT ERROR", `Handling a message failed because of: ${chariotListenerError}`);
+            Logger.error("CHARIOT ERROR", `Handling a message failed because of: ${chariotListenerError}`);
         }
     }
 
@@ -82,7 +88,7 @@ class ChariotClient extends Eris.Client {
      * successfully logged in to Discord and is now ready to listen to events.
      */
     _readyEmitter() {
-        Logger.log(0, "CHARIOT STARTUP", "Successfully started and logged in!");
+        Logger.success("CHARIOT STARTUP", "Successfully started and logged in!");
     }
 
     _registerInternalCommands() {
@@ -97,27 +103,64 @@ class ChariotClient extends Eris.Client {
         }
     }
 
-    /**
-     * Registering all commands within the specified command path.
-     * This method also checks for duplicate command names and ignores
-     * any file type but JavaScript files to avoid unwanted behavior due to user error.
-     * @param {string} directory The directory path of the command files. 
+     /**
+     * Register all Chariot events extending the abstract Event class, no matter where events are saved without providing any path.
+     * @async
      */
-    _registerChariotCommands(directory) {
-        this.commandFiles = read(directory).filter(file => file.endsWith('.js'));
+    async _registerChariotEvents() {
+        const directory = path.dirname(require.main.filename);
+        const readFiles = await readdirp.promise(directory, { fileFilter: '*.js', directoryFilter: ['!.git', '!*modules'] });
 
-        for (const chariotCommandFile of this.commandFiles) {
-            const chariotCommand = require(`${directory}/${chariotCommandFile}`);
+        this.eventFiles = readFiles.map(file => file.path);
 
-            if (this.commands.find(commandName => commandName.name === chariotCommand.name)) {
-                throw `A command with the name of ${chariotCommand.name} has already been registered!`;
+        for (const chariotEventFile of this.eventFiles) {
+            const chariotEvent = require(path.join(directory, chariotEventFile));
+
+            chariotEvent.client = this;
+
+            if (chariotEvent instanceof Event) {
+                if (!Constants.EVENTS.EVENT_NAMES.includes(chariotEvent._eventName)) {
+                    throw new Error(`Unknown event called "${chariotEvent._eventName}" in file "${chariotEventFile}". Event names are case sensitive! Check https://abal.moe/Eris/docs/Client for an event overview.`)
+                }
+
+                if (typeof chariotEvent.execute === 'undefined') {
+                    throw new Error(`Couldn't find main executor "execute" in event file "${chariotEventFile}"!`);
+                }
+
+                this.events.add(chariotEvent);
             }
-
-            this.commands.set(chariotCommand.name, chariotCommand);
         }
 
-        const commandPlural = this.commands.size == 1 ? 'command' : 'commands';
-        Logger.log(0, "COMMANDS", `Successfully loaded ${this.commands.size} ${commandPlural}`);
+        this.events.forEach((event) => {
+            this.on(event._eventName, event.execute);
+        });
+
+        Logger.success("EVENTS", `Successfully loaded ${this.events.size} ${(this.events.size === 1) ? 'event' : 'events'}`);
+    }
+
+    /**
+     * Register all Chariot commands extending the abstract Command class, no matter where commands are saved without providing any path.
+     * @async
+     */
+    async _registerChariotCommands() {
+        const directory = path.dirname(require.main.filename);
+        const readFiles = await readdirp.promise(directory, { fileFilter: '*.js', directoryFilter: ['!.git', '!*modules'] });
+        
+        this.commandFiles = readFiles.map(file => file.path);
+
+        for (const chariotCommandFile of this.commandFiles) {
+            const chariotCommand = require(path.join(directory, chariotCommandFile));
+
+            if (this.commands.has(chariotCommand.name)) {
+                throw new Error(`A command with the name of ${chariotCommand.name} has already been registered!`);
+            }
+
+            if (chariotCommand instanceof Command) {
+                this.commands.set(chariotCommand.name, chariotCommand);
+            }
+        }
+
+        Logger.success("COMMANDS", `Successfully loaded ${this.commands.size} ${(this.commands.size === 1) ? 'command' : 'commands'}`);
     }
 }
 

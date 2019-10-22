@@ -25,9 +25,10 @@ class ChariotEmbed {
 
     /**
      * Resolves a color to a usable "Discord readable" color
+     * @private
      * @param {*} color Any color which can be resolved 
      */
-    resolveColor(color) {
+    _resolveColor(color) {
         if (typeof color === 'string') {
             if (color === 'RANDOM') return Math.floor(Math.random() * (0xFFFFFF + 1));
             color = Colors[color.toUpperCase()] || parseInt(color.replace('#', ''), 16);
@@ -38,10 +39,10 @@ class ChariotEmbed {
 
     /**
      * Set the color of this Embed
-     * @param {*} color Any color resolvable by this.resolveColor 
+     * @param {*} color Any color resolvable by this._resolveColor 
      */
     setColor(color) {
-        this.color = this.resolveColor(color);
+        this.color = this._resolveColor(color);
 
         return this;
     }

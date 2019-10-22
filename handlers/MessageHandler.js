@@ -42,7 +42,7 @@ class MessageHandler {
         if (missingPermissions.length) {
             console.log(missingPermissions);
             return message.channel.createMessage(`Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((messageSendError) => {
-                Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
             });
         }
 
@@ -65,7 +65,7 @@ class MessageHandler {
                 .setDescription(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`)
             ).catch((embedSendError) => {
                 message.channel.createMessage(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`).catch((messageSendError) => {
-                    Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                    Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                 });
             });
         }
@@ -82,7 +82,7 @@ class MessageHandler {
                 .setTitle(`Command **${command.name}** is only available in NSFW channels!`)
             ).catch((embedSendError) => {
                 message.channel.createMessage(`Command **${command.name}** is only available in NSFW channels!`).catch((messageSendError) => {
-                    Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                    Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                 });
             });
         }
@@ -108,7 +108,7 @@ class MessageHandler {
                     .setTitle(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`)
                 ).catch((embedSendError) => {
                     message.channel.createMessage(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`).catch((messageSendError) => {
-                        Logger.log(1, 'MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                        Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                     });
                 });
             }
@@ -118,21 +118,51 @@ class MessageHandler {
         setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
         const next = () => {
-            command.execute(message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
-                Logger.log(2, "COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
-            });
+            if (commandArguments.length && command.subcommands) {
+                if (Array.isArray(command.subcommands) && command.subcommands.length) {
+                    for (let i = 0; i < command.subcommands.length; i++) {
+                        if (!command.subcommands[i]) {
+                            throw new Error('An empty subcommand name was specified inside of the subcommands property array!');
+                        }
+
+                        if (typeof command[command.subcommands[i]] !== 'function') {
+                            throw new Error(`Specified subcommand "${command.subcommands[i]}" has no invokable method inside command class "${command.name}"! You can fix this by adding this method to your command class: async ${command.subcommands[i]}(message, args, chariot) {}`);
+                        }
+
+                        if (command.subcommands[i].toLowerCase() === 'execute') {
+                            throw new Error('The main command executor "execute" cannot be overwritten!');
+                        }
+                    }
+
+                    if (command.subcommands.includes(commandArguments[0].toLowerCase()) && typeof command[commandArguments[0].toLowerCase()] === 'function') {
+                        const subcommandName = commandArguments.shift();
+
+                        command[subcommandName.toLowerCase()](message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
+                            Logger.error('SUBCOMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+                        });
+                    } else {
+                        command.execute(message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
+                            Logger.error('COMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+                        });
+                    }
+                } else {
+                    throw new Error('A specified subcommands property must be of type array and have at least 1 element! If no subcommands are required, remove the subcommands property from the command constructor!');
+                }
+            } else {
+                command.execute(message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
+                    Logger.error('COMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+                });
+            }
         }
 
         try {
             if (typeof command.runPreconditions === 'function') {
                 await command.runPreconditions(message, commandArguments, this.chariot, next);
             } else {
-                command.execute(message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
-                    Logger.log(2, "COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
-                });
+                next();
             } 
         } catch (chariotCommandExecutionError) {
-            Logger.log(2, "COMMAND EXECUTION ERROR", `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+            Logger.error('COMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
         }
     }
 }

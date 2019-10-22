@@ -2,9 +2,8 @@
  * Really simple and pretty straight forward custom config holder
  */
 class ChariotConfig {
-    constructor(token, commandPath, chariotConfig, erisConfig) {      
+    constructor(token, chariotConfig, erisConfig) {      
         this.token = token;
-        this.commandPath = commandPath;
         this.erisConfig = erisConfig;
         this.chariotConfig = chariotConfig;
     }
