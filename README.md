@@ -1,3 +1,6 @@
+---
+permalink: /index.html
+---
 <div align="middle">
     <p><img src="https://img.kirameki.one/9mAtQ3Nb.png" width="800"></p>
     <a href="https://discord.gg/kKPZdA6"><img src="https://discordapp.com/api/guilds/464440032577716238/embed.png" alt="Discord Server"/></a>
