@@ -45,7 +45,6 @@ class MessageHandler {
             }
 
             if (missingPermissions.length) {
-                console.log(missingPermissions);
                 return message.channel.createMessage(`Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((messageSendError) => {
                     Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                 });
