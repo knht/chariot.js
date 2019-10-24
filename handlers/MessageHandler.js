@@ -29,45 +29,51 @@ class MessageHandler {
         /* Stop handling if no command was found */
         if (!command) return;
 
-        /* Check if the bot has adequate permissions */
-        const pendingPermissions = (!command.permissions) ? this.minimumPermissions : this.minimumPermissions.concat(command.permissions);
-        let missingPermissions = [];
+        /* Check if it is a DM */
+        if (message.channel.type !== 0 && !command.allowDMs) return;
 
-        for (let i = 0; i < pendingPermissions.length; i++) {
-            if (!message.channel.permissionsOf(this.chariot.user.id).has(pendingPermissions[i])) {
-                missingPermissions.push(Util.formatPermission(pendingPermissions[i]));
-            }
-        }
+        /* Enable permission check for guild messages */
+        if (message.channel.type === 0) {
+            /* Check if the bot has adequate permissions */
+            const pendingPermissions = (!command.permissions) ? this.minimumPermissions : this.minimumPermissions.concat(command.permissions);
+            let missingPermissions = [];
 
-        if (missingPermissions.length) {
-            console.log(missingPermissions);
-            return message.channel.createMessage(`Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((messageSendError) => {
-                Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
-            });
-        }
-
-        /* Check if the user has adequate permissions */
-        const pendingUserPermissions = (!command.userPermissions) ? false : command.userPermissions;
-        let missingUserPermissions = [];
-
-        if (pendingUserPermissions) {
-            for (let j = 0; j < pendingUserPermissions.length; j++) {
-                if (!message.member.permission.has(pendingUserPermissions[j])) {
-                    missingUserPermissions.push(Util.formatPermission(pendingUserPermissions[j]));
+            for (let i = 0; i < pendingPermissions.length; i++) {
+                if (!message.channel.permissionsOf(this.chariot.user.id).has(pendingPermissions[i])) {
+                    missingPermissions.push(Util.formatPermission(pendingPermissions[i]));
                 }
             }
-        }
 
-        if (missingUserPermissions.length) {
-            return message.channel.createEmbed(new Embed()
-                .setColor('RED')
-                .setTitle('Insufficient Permissions!')
-                .setDescription(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`)
-            ).catch((embedSendError) => {
-                message.channel.createMessage(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`).catch((messageSendError) => {
+            if (missingPermissions.length) {
+                console.log(missingPermissions);
+                return message.channel.createMessage(`Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((messageSendError) => {
                     Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                 });
-            });
+            }
+
+            /* Check if the user has adequate permissions */
+            const pendingUserPermissions = (!command.userPermissions) ? false : command.userPermissions;
+            let missingUserPermissions = [];
+
+            if (pendingUserPermissions) {
+                for (let j = 0; j < pendingUserPermissions.length; j++) {
+                    if (!message.member.permission.has(pendingUserPermissions[j])) {
+                        missingUserPermissions.push(Util.formatPermission(pendingUserPermissions[j]));
+                    }
+                }
+            }
+
+            if (missingUserPermissions.length) {
+                return message.channel.createEmbed(new Embed()
+                    .setColor('RED')
+                    .setTitle('Insufficient Permissions!')
+                    .setDescription(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`)
+                ).catch((embedSendError) => {
+                    message.channel.createMessage(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`).catch((messageSendError) => {
+                        Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                    });
+                });
+            }
         }
 
         /* Check if the command is restricted to the bot owner */
@@ -76,15 +82,17 @@ class MessageHandler {
         }
 
         /* Check if an NSFW command is only used in an NSFW channel */
-        if (command.nsfw && !message.channel.nsfw) {
-            return message.channel.createEmbed(new Embed()
-                .setColor('RED')
-                .setTitle(`Command **${command.name}** is only available in NSFW channels!`)
-            ).catch((embedSendError) => {
-                message.channel.createMessage(`Command **${command.name}** is only available in NSFW channels!`).catch((messageSendError) => {
-                    Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+        if (message.channel.type === 0) {
+            if (command.nsfw && !message.channel.nsfw) {
+                return message.channel.createEmbed(new Embed()
+                    .setColor('RED')
+                    .setTitle(`Command **${command.name}** is only available in NSFW channels!`)
+                ).catch((embedSendError) => {
+                    message.channel.createMessage(`Command **${command.name}** is only available in NSFW channels!`).catch((messageSendError) => {
+                        Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                    });
                 });
-            });
+            }
         }
 
         /* Command Cooldowns */
@@ -104,7 +112,7 @@ class MessageHandler {
                 const timeLeftFormatted = juration.stringify(timeLeft, { format: 'long', units: 1 });
 
                 return message.channel.createEmbed(new Embed()
-                    .setColor('BLUE')
+                    .setColor(this.chariot.chariotOptions.chariotConfig.primaryColor || 'RANDOM')
                     .setTitle(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`)
                 ).catch((embedSendError) => {
                     message.channel.createMessage(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`).catch((messageSendError) => {
