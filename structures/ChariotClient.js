@@ -69,10 +69,6 @@ class ChariotClient extends Eris.Client {
      */
     _messageListener(message) {
         try {
-            if (!this.chariotOptions.chariotConfig.allowDMs) {
-                if (message.channel.type !== 0) return;
-            }
-
             if (message.author.bot) return;
             if (!message.content.startsWith(this.prefix)) return;
             if (message.content === this.prefix) return;

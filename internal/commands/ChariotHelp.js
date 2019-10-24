@@ -5,6 +5,7 @@ class ChariotHelp {
     constructor() {
         this.name = 'help';
         this.permissions = ['embedLinks'];
+        this.allowDMs = true;
         this.help = {
             message: 'Get either a general Help card or instructions for specified commands! Specifying a command is optional. If a command was specified its help text will show up.',
             usage: 'help [command]',
