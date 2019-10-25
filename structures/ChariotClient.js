@@ -147,7 +147,7 @@ class ChariotClient extends Eris.Client {
         for (const chariotCommandFile of this.commandFiles) {
             const chariotCommand = require(path.join(directory, chariotCommandFile));
 
-            if (this.commands.has(chariotCommand.name)) {
+            if (this.commands.has(chariotCommand.name) && (chariotCommand instanceof Command)) {
                 throw new Error(`A command with the name of ${chariotCommand.name} has already been registered!`);
             }
 
