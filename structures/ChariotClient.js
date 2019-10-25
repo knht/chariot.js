@@ -15,17 +15,16 @@ const Constants         = require('../constants/General');
  */
 class ChariotClient extends Eris.Client {
     constructor (chariotOptions) {
-
         if (!chariotOptions.token) {
-            throw "You must specify a valid Discord token!";
+            throw 'You must specify a valid Discord token!';
         }
 
         if (!chariotOptions.chariotConfig.prefix) {
-            throw "You must specify a valid prefix for your bot!";
+            throw 'You must specify a valid prefix for your bot!';
         }
 
         if (!chariotOptions.chariotConfig.owner.length) {
-            throw "You must specify a valid Discord ID for your bot owner!";
+            throw 'You must specify a valid Discord ID for your bot owner!';
         }
 
         super(chariotOptions.token, chariotOptions.erisConfig);
@@ -75,7 +74,7 @@ class ChariotClient extends Eris.Client {
 
             this.messageHandler.handle(message, this.commands);
         } catch (chariotListenerError) {
-            Logger.error("CHARIOT ERROR", `Handling a message failed because of: ${chariotListenerError}`);
+            Logger.error('CHARIOT ERROR', `Handling a message failed because of: ${chariotListenerError}`);
         }
     }
 
@@ -84,7 +83,7 @@ class ChariotClient extends Eris.Client {
      * successfully logged in to Discord and is now ready to listen to events.
      */
     _readyEmitter() {
-        Logger.success("CHARIOT STARTUP", "Successfully started and logged in!");
+        Logger.success('CHARIOT STARTUP', 'Successfully started and logged in!');
     }
 
     _registerInternalCommands() {
@@ -131,7 +130,7 @@ class ChariotClient extends Eris.Client {
             this.on(event._eventName, event.execute);
         });
 
-        Logger.success("EVENTS", `Successfully loaded ${this.events.size} ${(this.events.size === 1) ? 'event' : 'events'}`);
+        Logger.success('EVENTS', `Successfully loaded ${this.events.size} ${(this.events.size === 1) ? 'event' : 'events'}`);
     }
 
     /**
@@ -156,7 +155,7 @@ class ChariotClient extends Eris.Client {
             }
         }
 
-        Logger.success("COMMANDS", `Successfully loaded ${this.commands.size} ${(this.commands.size === 1) ? 'command' : 'commands'}`);
+        Logger.success('COMMANDS', `Successfully loaded ${this.commands.size} ${(this.commands.size === 1) ? 'command' : 'commands'}`);
     }
 }
 
