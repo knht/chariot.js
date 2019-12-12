@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/riyacchi/chariot.js/issues"
   },
-  "homepage": "https://github.com/riyacchi/chariot.js#readme",
+  "homepage": "https://riyacchi.github.io/chariot.js/",
   "dependencies": {
     "bufferutil": "^4.0.1",
     "chalk": "^2.4.2",
