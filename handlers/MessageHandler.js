@@ -145,11 +145,11 @@ class MessageHandler {
                         const subcommandName = commandArguments.shift();
 
                         command[subcommandName.toLowerCase()](message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
-                            Logger.error('SUBCOMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+                            Logger.error('SUBCOMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError.stack}`);
                         });
                     } else {
                         command.execute(message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
-                            Logger.error('COMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+                            Logger.error('COMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError.stack}`);
                         });
                     }
                 } else {
@@ -157,7 +157,7 @@ class MessageHandler {
                 }
             } else {
                 command.execute(message, commandArguments, this.chariot).catch(chariotCommandExecutionError => {
-                    Logger.error('COMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
+                    Logger.error('COMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError.stack}`);
                 });
             }
         }
