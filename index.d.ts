@@ -1,9 +1,9 @@
 declare module "structures/ChariotCommand" {
-    export = ChartiotCommand;
+    export = ChariotCommand;
     /**
      * Basic abstract Command class for command identification
      */
-    class ChartiotCommand {
+    class ChariotCommand {
         execute(): void;
         /**
          * Simple argument handler for getting tailed arguments with custom length and delimeters

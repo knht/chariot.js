@@ -1,7 +1,7 @@
 /**
  * Basic abstract Command class for command identification
  */
-class ChartiotCommand {
+class ChariotCommand {
     execute() {
         throw new Error('No command logic implemented!');
     }
@@ -24,4 +24,4 @@ class ChartiotCommand {
     }
 }
 
-module.exports = ChartiotCommand;
+module.exports = ChariotCommand;
