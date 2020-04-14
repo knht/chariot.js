@@ -104,7 +104,21 @@ class ChariotClient extends Eris.Client {
      */
     async _registerChariotEvents() {
         const directory = path.dirname(require.main.filename);
-        const readFiles = await readdirp.promise(directory, { fileFilter: '*.js', directoryFilter: ['!.git', '!*modules'] });
+        const customDirectoryFilter = [];
+
+        if (
+            this.chariotOptions.chariotConfig.excludeDirectories !== void 0
+            && Array.isArray(this.chariotOptions.chariotConfig.excludeDirectories) 
+            && this.chariotOptions.chariotConfig.excludeDirectories.length >= 1
+        ) {
+            this.chariotOptions.chariotConfig.excludeDirectories.forEach((directoryItem) => {
+                if (directoryItem.length > 0) {
+                    customDirectoryFilter.push(`!${directoryItem}`);
+                }
+            });
+        }
+
+        const readFiles = await readdirp.promise(directory, { fileFilter: '*.js', directoryFilter: ['!.git', '!*modules', ...customDirectoryFilter] });
 
         this.eventFiles = readFiles.map(file => file.path);
 
@@ -139,7 +153,21 @@ class ChariotClient extends Eris.Client {
      */
     async _registerChariotCommands() {
         const directory = path.dirname(require.main.filename);
-        const readFiles = await readdirp.promise(directory, { fileFilter: '*.js', directoryFilter: ['!.git', '!*modules'] });
+        const customDirectoryFilter = [];
+
+        if (
+            this.chariotOptions.chariotConfig.excludeDirectories !== void 0
+            && Array.isArray(this.chariotOptions.chariotConfig.excludeDirectories) 
+            && this.chariotOptions.chariotConfig.excludeDirectories.length >= 1
+        ) {
+            this.chariotOptions.chariotConfig.excludeDirectories.forEach((directoryItem) => {
+                if (directoryItem.length > 0) {
+                    customDirectoryFilter.push(`!${directoryItem}`);
+                }
+            });
+        }
+
+        const readFiles = await readdirp.promise(directory, { fileFilter: '*.js', directoryFilter: ['!.git', '!*modules', ...customDirectoryFilter] });
         
         this.commandFiles = readFiles.map(file => file.path);
 
