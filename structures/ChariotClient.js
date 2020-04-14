@@ -16,15 +16,15 @@ const Constants         = require('../constants/General');
 class ChariotClient extends Eris.Client {
     constructor (chariotOptions) {
         if (!chariotOptions.token) {
-            throw 'You must specify a valid Discord token!';
+            throw new Error('You must specify a valid Discord token!');
         }
 
         if (!chariotOptions.chariotConfig.prefix) {
-            throw 'You must specify a valid prefix for your bot!';
+            throw new Error('You must specify a valid prefix for your bot!');
         }
 
         if (!chariotOptions.chariotConfig.owner.length) {
-            throw 'You must specify a valid Discord ID for your bot owner!';
+            throw new Errror('You must specify a valid Discord ID for your bot owner!');
         }
 
         super(chariotOptions.token, chariotOptions.erisConfig);
@@ -91,7 +91,7 @@ class ChariotClient extends Eris.Client {
             const defaultHelpCommand = require('../internal/commands/ChariotHelp');
 
             if (this.commands.find(commandName => commandName.name === defaultHelpCommand.name)) {
-                throw `Default help command couldn't be initialized because another command with the same name already exists!`;
+                throw new Error(`Default help command couldn't be initialized because another command with the same name already exists!`);
             }
 
             this.commands.set(defaultHelpCommand.name, defaultHelpCommand);
