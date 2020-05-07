@@ -11,10 +11,16 @@
     "url": "git+https://github.com/riyacchi/chariot.js.git"
   },
   "keywords": [
-    "Eris",
-    "Discord",
-    "Framework",
-    "Kirameki"
+    "eris",
+    "discord",
+    "bot",
+    "commands",
+    "events",
+    "boilerplate",
+    "chariot",
+    "chariotjs",
+    "framework",
+    "kirameki"
   ],
   "author": "Riya <kato.hana@outlook.jp>",
   "license": "GPL-3.0",
