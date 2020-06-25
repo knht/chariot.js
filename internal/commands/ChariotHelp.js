@@ -16,7 +16,7 @@ class ChariotHelp {
 
     async execute(message, args, chariot) {
         if (!args[0]) {
-            const commandNames = chariot.commands.filter((cmnds) => !cmnds.owner).map((cmnds) => '`' + cmnds.name + '`');
+            const commandNames = chariot.commands.filter((cmnds) => !cmnds.owner).filter((cmnds) => (cmnds.hasOwnProperty('help')) ? ((cmnds.help.visible === undefined) ? true : !(cmnds.help.visible === false)) : true).map((cmnds) => '`' + cmnds.name + '`');
 
             return message.channel.createEmbed(new Embed()
                 .setColor(chariot.chariotOptions.chariotConfig.primaryColor || 'RANDOM')
