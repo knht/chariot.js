@@ -24,7 +24,7 @@ class ChariotClient extends Eris.Client {
         }
 
         if (!chariotOptions.chariotConfig.owner.length) {
-            throw new Errror('You must specify a valid Discord ID for your bot owner!');
+            throw new Error('You must specify a valid Discord ID for your bot owner!');
         }
 
         super(chariotOptions.token, chariotOptions.erisConfig);
