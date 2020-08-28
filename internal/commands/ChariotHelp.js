@@ -21,7 +21,7 @@ class ChariotHelp {
             return message.channel.createEmbed(new Embed()
                 .setColor(chariot.chariotOptions.chariotConfig.primaryColor || 'RANDOM')
                 .setTitle('Command Help')
-                .setDescription(`Get detailed command instructions for any command!\n You can specify a certain command by writing \`${chariot.chariotOptions.chariotConfig.prefix}help <commandName>\`!`)
+                .setDescription(`Get detailed command instructions for any command!\n You can specify a certain command by writing \`${message.prefix}help <commandName>\`!`)
                 .addField('Commands', commandNames.join(', '))
             );
         } else {
@@ -53,16 +53,16 @@ class ChariotHelp {
             helpEmbed.setColor(chariot.chariotOptions.chariotConfig.primaryColor || 'RANDOM');
             helpEmbed.setTitle(`**${foundCommand.name}** Help`);
             helpEmbed.setDescription(foundCommand.help.message || 'No help description available');
-            helpEmbed.addField('Usage', (foundCommand.help.usage) ? `\`${chariot.chariotOptions.chariotConfig.prefix}${foundCommand.help.usage}\`` : 'No usage available', foundCommand.help.inline);
+            helpEmbed.addField('Usage', (foundCommand.help.usage) ? `\`${message.prefix}${foundCommand.help.usage}\`` : 'No usage available', foundCommand.help.inline);
 
             let helpArray = [];
             let exampleText = '';
 
             if (Array.isArray(foundCommand.help.example)) {
-                helpArray = foundCommand.help.example.map((helpItem) => `\`${chariot.chariotOptions.chariotConfig.prefix}${helpItem}\``);
+                helpArray = foundCommand.help.example.map((helpItem) => `\`${message.prefix}${helpItem}\``);
                 exampleText = helpArray.join(', ');
             } else {
-                exampleText = `\`${chariot.chariotOptions.chariotConfig.prefix}${foundCommand.help.example}\``;
+                exampleText = `\`${message.prefix}${foundCommand.help.example}\``;
             }
 
             helpEmbed.addField(Array.isArray(foundCommand.help.example) ? 'Examples' : 'Example', exampleText, foundCommand.help.inline);
