@@ -31,6 +31,7 @@ class ChariotClient extends Eris.Client {
 
         this.chariotOptions = chariotOptions;
         this.prefix         = chariotOptions.chariotConfig.prefix;
+        this.guildPrefixes  = chariotOptions.chariotConfig.guildPrefixes;
         
         this.events         = new Set();
         this.commands       = new Collection();
@@ -94,6 +95,23 @@ class ChariotClient extends Eris.Client {
                     prefix = `<@!${this.user.id}> `;
                 } else {
                     prefix = this.prefix;
+                }
+            }
+
+            if (prefix === null && !!this.guildPrefixes) {
+                if (Array.isArray(this.guildPrefixes) && this.guildPrefixes.length > 0) {
+                    const validPrefixes = this.guildPrefixes.filter((guildPrefix) => guildPrefix.guildID === message.channel.guild.id);
+                    
+                    if (validPrefixes.length > 0) {
+                        const customPrefixes = validPrefixes.map((validPrefix) => validPrefix.prefix);
+
+                        for (const customPrefix of customPrefixes) {
+                            if (message.content.startsWith(customPrefix)) {
+                                prefix = customPrefix;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
