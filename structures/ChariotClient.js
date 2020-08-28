@@ -68,9 +68,29 @@ class ChariotClient extends Eris.Client {
      */
     _messageListener(message) {
         try {
+            let prefix = null;
+
             if (message.author.bot) return;
-            if (!message.content.startsWith(this.prefix)) return;
-            if (message.content === this.prefix) return;
+
+            if (Array.isArray(this.prefix)) {
+                if (this.prefix.length === 0) {
+                    throw new Error(`The array of passed prefixes mustn't be empty!`);
+                }
+                
+                for (const pf of this.prefix) {
+                    if (message.content.startsWith(pf)) {
+                        prefix = pf;
+                        break;
+                    }
+                }
+            } else {
+                prefix = this.prefix;
+            }
+
+            if (!message.content.startsWith(prefix)) return;
+            if (message.content === prefix) return;
+
+            message.prefix = prefix;
 
             this.messageHandler.handle(message, this.commands);
         } catch (chariotListenerError) {
