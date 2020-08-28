@@ -22,7 +22,7 @@ class MessageHandler {
      * @param {Chariot.Collection} commands A collection containing all registered commands 
      */
     async handle(message, commands) {
-        const commandArguments  = message.content.slice(this.chariot.prefix.length).split(/ +/);
+        const commandArguments  = message.content.slice(message.prefix.length).split(/ +/);
         const commandName       = commandArguments.shift().toLowerCase();
         const command           = commands.get(commandName) || commands.find(chariotCommand => chariotCommand.aliases && chariotCommand.aliases.includes(commandName));
 
