@@ -76,6 +76,12 @@ class ChariotClient extends Eris.Client {
                 if (this.prefix.length === 0) {
                     throw new Error(`The array of passed prefixes mustn't be empty!`);
                 }
+
+                const mentionIndex = this.prefix.indexOf('@mention');
+
+                if (mentionIndex !== -1) {
+                    this.prefix[mentionIndex] = `<@!${this.user.id}> `;
+                }
                 
                 for (const pf of this.prefix) {
                     if (message.content.startsWith(pf)) {
@@ -84,7 +90,11 @@ class ChariotClient extends Eris.Client {
                     }
                 }
             } else {
-                prefix = this.prefix;
+                if (this.prefix.toLowerCase() === '@mention') {
+                    prefix = `<@!${this.user.id}> `;
+                } else {
+                    prefix = this.prefix;
+                }
             }
 
             if (!message.content.startsWith(prefix)) return;
