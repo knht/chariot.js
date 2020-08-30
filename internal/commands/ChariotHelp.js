@@ -15,7 +15,7 @@ class ChariotHelp {
     }
 
     async execute(message, args, chariot) {
-        const prefixHandler = (message.prefix === `<@!${chariot.user.id}> `) ? `@${chariot.user.username}#${chariot.user.discriminator} ` : message.prefix;
+        const prefixHandler = (message.prefix === `<@!${chariot.user.id}> ` || message.prefix === `<@${chariot.user.id}> `) ? `@${chariot.user.username}#${chariot.user.discriminator} ` : message.prefix;
 
         if (!args[0]) {
             const commandNames = chariot.commands.filter((cmnds) => !cmnds.owner).filter((cmnds) => (cmnds.hasOwnProperty('help')) ? ((cmnds.help.visible === undefined) ? true : !(cmnds.help.visible === false)) : true).map((cmnds) => '`' + cmnds.name + '`');
