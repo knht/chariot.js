@@ -94,17 +94,17 @@ class ChariotClient extends Eris.Client {
             } else {
                 if (this.prefix.toLowerCase() === '@mention') {
                     if (message.content.startsWith('<@!')) {
-                        this.prefix = `<@!${this.user.id}> `;
+                        prefix = `<@!${this.user.id}> `;
                     } else {
-                        this.prefix = `<@${this.user.id}> `;
+                        prefix = `<@${this.user.id}> `;
                     }
+                } else {
+                    prefix = this.prefix;
                 }
-
-                prefix = this.prefix;
             }
 
             if (prefix === null && !!this.guildPrefixes) {
-                if (Array.isArray(this.guildPrefixes) && this.guildPrefixes.length > 0) {
+                if (Array.isArray(this.guildPrefixes) && this.guildPrefixes.length > 0 && message.channel.type === 0) {
                     const validPrefixes = this.guildPrefixes.filter((guildPrefix) => guildPrefix.guildID === message.channel.guild.id);
                     
                     if (validPrefixes.length > 0) {
@@ -127,7 +127,7 @@ class ChariotClient extends Eris.Client {
 
             this.messageHandler.handle(message, this.commands);
         } catch (chariotListenerError) {
-            Logger.error('CHARIOT ERROR', `Handling a message failed because of: ${chariotListenerError}`);
+            Logger.error('CHARIOT ERROR', `Handling a message failed because of: ${chariotListenerError.stack}`);
         }
     }
 
