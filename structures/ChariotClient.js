@@ -81,7 +81,8 @@ class ChariotClient extends Eris.Client {
                 const mentionIndex = this.prefix.indexOf('@mention');
 
                 if (mentionIndex !== -1) {
-                    this.prefix[mentionIndex] = `<@!${this.user.id}> `;
+                    this.prefix.splice(mentionIndex, 1);
+                    this.prefix.push(`<@!${this.user.id}> `, `<@${this.user.id}> `);
                 }
                 
                 for (const pf of this.prefix) {
@@ -92,10 +93,14 @@ class ChariotClient extends Eris.Client {
                 }
             } else {
                 if (this.prefix.toLowerCase() === '@mention') {
-                    prefix = `<@!${this.user.id}> `;
-                } else {
-                    prefix = this.prefix;
+                    if (message.content.startsWith('<@!')) {
+                        this.prefix = `<@!${this.user.id}> `;
+                    } else {
+                        this.prefix = `<@${this.user.id}> `;
+                    }
                 }
+
+                prefix = this.prefix;
             }
 
             if (prefix === null && !!this.guildPrefixes) {
