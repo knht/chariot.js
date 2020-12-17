@@ -51,7 +51,7 @@ class MessageHandler {
             }
 
             /* Check if the user has adequate permissions */
-            const pendingUserPermissions = (!command.userPermissions) ? false : command.userPermissions;
+            const pendingUserPermissions = (!command.userPermissions) ? false : command.userPermissions.permissions;
             let missingUserPermissions = [];
 
             if (pendingUserPermissions) {
@@ -65,10 +65,10 @@ class MessageHandler {
             if (missingUserPermissions.length) {
                 return message.channel.createEmbed(new Embed()
                     .setColor('RED')
-                    .setTitle('Insufficient Permissions!')
-                    .setDescription(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`)
+                    .setTitle(command.userPermissions.title ? command.userPermissions.title : 'Insufficient Permissions!')
+                    .setDescription(command.userPermissions.description ? command.userPermissions.description.replace("{missingUserPermissions}", missingUserPermissions.join(', ')) : `You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`)
                 ).catch((embedSendError) => {
-                    message.channel.createMessage(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`).catch((messageSendError) => {
+                    message.channel.createMessage(command.userPermissions.description ? command.userPermissions.description.replace("{missingUserPermissions}", missingUserPermissions.join(', ')) : `You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`).catch((messageSendError) => {
                         Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                     });
                 });
@@ -76,18 +76,18 @@ class MessageHandler {
         }
 
         /* Check if the command is restricted to the bot owner */
-        if (command.owner && !this.chariot.chariotOptions.chariotConfig.owner.includes(message.author.id)) {
-            return message.channel.createMessage("Insufficient permissions!");
+        if (command.owner && command.owner.enable && !this.chariot.chariotOptions.chariotConfig.owner.includes(message.author.id)) {
+            return message.channel.createMessage(command.owner.message ? command.owner.message : "Insufficient permissions!");
         }
 
         /* Check if an NSFW command is only used in an NSFW channel */
         if (message.channel.type === 0) {
-            if (command.nsfw && !message.channel.nsfw) {
+            if (command.nsfw && command.nsfw.enable && !message.channel.nsfw) {
                 return message.channel.createEmbed(new Embed()
                     .setColor('RED')
-                    .setTitle(`Command **${command.name}** is only available in NSFW channels!`)
+                    .setTitle(command.nsfw.message ? command.nsfw.replace("{command}", command.name) : `Command **${command.name}** is only available in NSFW channels!`)
                 ).catch((embedSendError) => {
-                    message.channel.createMessage(`Command **${command.name}** is only available in NSFW channels!`).catch((messageSendError) => {
+                    message.channel.createMessage(command.nsfw.message ? command.nsfw.message.replace("{command}", command.name) : `Command **${command.name}** is only available in NSFW channels!`).catch((messageSendError) => {
                         Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                     });
                 });
@@ -95,15 +95,16 @@ class MessageHandler {
         }
 
         /* Command Cooldowns */
+       if (command.cooldown) {
         if (!this.cooldowns.has(command.name)) {
             this.cooldowns.set(command.name, new Collection());
         }
 
         const now = Date.now();
         const timestamps = this.cooldowns.get(command.name);
-        const cooldownAmount = (command.cooldown || 0) * 1000;
-
-        if (timestamps.has(message.author.id)) {
+        const cooldownAmount = (command.cooldown.time || 0) * 1000;
+        
+        if (timestamps.has(message.author.id) ) {
             const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
             if (now < expirationTime) {
@@ -112,17 +113,18 @@ class MessageHandler {
 
                 return message.channel.createEmbed(new Embed()
                     .setColor(this.chariot.chariotOptions.chariotConfig.primaryColor || 'RANDOM')
-                    .setTitle(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`)
+                    .setTitle(command.cooldown.message ? command.cooldown.message.replace("{timeLeft}", timeLeft).replace("{timeLeftFormatted}". timeLeftFormatted).replace("{command}", command.name) : `Please wait **${timeLeftFormatted}** before using **${command.name}** again`)
                 ).catch((embedSendError) => {
-                    message.channel.createMessage(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`).catch((messageSendError) => {
-                        Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                    message.channel.createMessage(command.command ? command.cooldown.message.replace("{timeLeft}", timeLeft).replace("{timeLeftFormatted}". timeLeftFormatted).replace("{command}", command.name) : `Please wait **${timeLeftFormatted}** before using **${command.name}** again`).catch((messageSendError) => {
+                            Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                        });
                     });
-                });
+                }
             }
-        }
 
-        timestamps.set(message.author.id, now);
-        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+            timestamps.set(message.author.id, now);
+            setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+       }
 
         const next = () => {
             if (commandArguments.length && command.subcommands) {
