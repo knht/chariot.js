@@ -12,7 +12,7 @@ class ChariotConfig {
          * Configure default locales
          */
         if (!this.chariotConfig.customLocales) {
-            this.chariotConfig.customLocales = {}
+            this.chariotConfig.customLocales = {};
         }
 
         this.chariotConfig.customLocales.missingPermissions = this.chariotConfig.customLocales.missingPermissions || "Can't run command **{command}** because I lack following permissions: **{missingPermissions}**";
