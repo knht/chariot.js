@@ -15,20 +15,6 @@ class MessageHandler {
     }
 
 
-    //custom messages
-    getCustomLocale(k, sk) {
-        let chariotConfig = this.chariot.chariotOptions.chariotConfig
-        if (!chariotConfig.customLocales) return false
-
-        if (sk) {
-            if (!chariotConfig.customLocales[k]) return false
-
-            return chariotConfig.customLocales[k][sk]
-        } else {
-            return chariotConfig.customLocales[k]
-        }
-    }
-
     /**
      * This method handles messages and checks their content for valid commands.
      * If a valid command was found, the command file will be checked for its instantiated properties and then executed.
