@@ -25,6 +25,7 @@ class MessageHandler {
         const commandArguments  = message.content.slice(message.prefix.length).split(/ +/);
         const commandName       = commandArguments.shift().toLowerCase();
         const command           = commands.get(commandName) || commands.find(chariotCommand => chariotCommand.aliases && chariotCommand.aliases.includes(commandName));
+        const chariotConfig     = this.chariot.chariotOptions.chariotConfig;
 
         /* Stop handling if no command was found */
         if (!command) return;
@@ -34,6 +35,7 @@ class MessageHandler {
 
         /* Enable permission check for guild messages */
         if (message.channel.type === 0) {
+
             /* Check if the bot has adequate permissions */
             const pendingPermissions = (!command.permissions) ? this.minimumPermissions : this.minimumPermissions.concat(command.permissions);
             let missingPermissions = [];
@@ -45,9 +47,10 @@ class MessageHandler {
             }
 
             if (missingPermissions.length) {
-                return message.channel.createMessage(`Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((messageSendError) => {
-                    Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
-                });
+                return message.channel.createMessage(Util.getLocale(chariotConfig, "missingPermissions").replace("{command}", command.name).replace("{missingPermissions}", missingPermissions.join(', ')))
+                    .catch((messageSendError) => {
+                        Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
+                    });
             }
 
             /* Check if the user has adequate permissions */
@@ -65,10 +68,10 @@ class MessageHandler {
             if (missingUserPermissions.length) {
                 return message.channel.createEmbed(new Embed()
                     .setColor('RED')
-                    .setTitle('Insufficient Permissions!')
-                    .setDescription(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`)
+                    .setTitle(Util.getLocale(chariotConfig, "userPermissions", "title"))
+                    .setDescription(Util.getLocale(chariotConfig, "userPermissions", "description").replace("{missingUserPermissions}", missingUserPermissions.join(', ')))
                 ).catch((embedSendError) => {
-                    message.channel.createMessage(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`).catch((messageSendError) => {
+                    message.channel.createMessage(Util.getLocale(chariotConfig, "userPermissions", "description").replace("{missingUserPermissions}", missingUserPermissions.join(', '))).catch((messageSendError) => {
                         Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                     });
                 });
@@ -76,8 +79,8 @@ class MessageHandler {
         }
 
         /* Check if the command is restricted to the bot owner */
-        if (command.owner && !this.chariot.chariotOptions.chariotConfig.owner.includes(message.author.id)) {
-            return message.channel.createMessage("Insufficient permissions!");
+        if (command.owner && !chariotConfig.owner.includes(message.author.id)) {
+            return message.channel.createMessage(Util.getLocale(chariotConfig, "owner"));
         }
 
         /* Check if an NSFW command is only used in an NSFW channel */
@@ -85,9 +88,9 @@ class MessageHandler {
             if (command.nsfw && !message.channel.nsfw) {
                 return message.channel.createEmbed(new Embed()
                     .setColor('RED')
-                    .setTitle(`Command **${command.name}** is only available in NSFW channels!`)
+                    .setTitle(Util.getLocale(chariotConfig, "nsfw").replace("{command}", command.name))
                 ).catch((embedSendError) => {
-                    message.channel.createMessage(`Command **${command.name}** is only available in NSFW channels!`).catch((messageSendError) => {
+                    message.channel.createMessage(Util.getLocale(chariotConfig, "nsfw").replace("{command}", command.name)).catch((messageSendError) => {
                         Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                     });
                 });
@@ -111,10 +114,10 @@ class MessageHandler {
                 const timeLeftFormatted = juration.stringify(timeLeft, { format: 'long', units: 1 });
 
                 return message.channel.createEmbed(new Embed()
-                    .setColor(this.chariot.chariotOptions.chariotConfig.primaryColor || 'RANDOM')
-                    .setTitle(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`)
+                    .setColor(chariotConfig.primaryColor || 'RANDOM')
+                    .setTitle(Util.getLocale(chariotConfig, "cooldown").replace("{timeLeft}", Math.round(timeLeft)).replace("{timeLeftFormatted}", timeLeftFormatted).replace("{command}", command.name))
                 ).catch((embedSendError) => {
-                    message.channel.createMessage(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`).catch((messageSendError) => {
+                    message.channel.createMessage(Util.getLocale(chariotConfig, "cooldown").replace("{timeLeft}", Math.round(timeLeft)).replace("{timeLeftFormatted}", timeLeftFormatted).replace("{command}", command.name)).catch((messageSendError) => {
                         Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                     });
                 });
@@ -167,7 +170,7 @@ class MessageHandler {
                 await command.runPreconditions(message, commandArguments, this.chariot, next);
             } else {
                 next();
-            } 
+            }
         } catch (chariotCommandExecutionError) {
             Logger.error('COMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
         }
