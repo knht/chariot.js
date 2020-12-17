@@ -14,6 +14,21 @@ class MessageHandler {
         this.minimumPermissions = ['readMessages', 'sendMessages'];
     }
 
+
+    //custom messages
+    getCustomLocale(k, sk) {
+        let chariotConfig = this.chariot.chariotOptions.chariotConfig
+        if (!chariotConfig.customLocales) return false
+
+        if (sk) {
+            if (!chariotConfig.customLocales[k]) return false
+
+            return chariotConfig.customLocales[k][sk]
+        } else {
+            return chariotConfig.customLocales[k]
+        }
+    }
+
     /**
      * This method handles messages and checks their content for valid commands.
      * If a valid command was found, the command file will be checked for its instantiated properties and then executed.
@@ -22,9 +37,9 @@ class MessageHandler {
      * @param {Chariot.Collection} commands A collection containing all registered commands 
      */
     async handle(message, commands) {
-        const commandArguments  = message.content.slice(message.prefix.length).split(/ +/);
-        const commandName       = commandArguments.shift().toLowerCase();
-        const command           = commands.get(commandName) || commands.find(chariotCommand => chariotCommand.aliases && chariotCommand.aliases.includes(commandName));
+        const commandArguments = message.content.slice(message.prefix.length).split(/ +/);
+        const commandName = commandArguments.shift().toLowerCase();
+        const command = commands.get(commandName) || commands.find(chariotCommand => chariotCommand.aliases && chariotCommand.aliases.includes(commandName));
 
         /* Stop handling if no command was found */
         if (!command) return;
@@ -34,6 +49,7 @@ class MessageHandler {
 
         /* Enable permission check for guild messages */
         if (message.channel.type === 0) {
+
             /* Check if the bot has adequate permissions */
             const pendingPermissions = (!command.permissions) ? this.minimumPermissions : this.minimumPermissions.concat(command.permissions);
             let missingPermissions = [];
@@ -45,7 +61,7 @@ class MessageHandler {
             }
 
             if (missingPermissions.length) {
-                return message.channel.createMessage(`Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((messageSendError) => {
+                return message.channel.createMessage(this.getCustomLocale("missingPermissions") ? this.getCustomLocale("missingPermissions").replace("{command}", command.name).replace("{missingPermissions}", missingPermissions.join(', ')) : `Can't run command **${command.name}** because I lack following permissions: **${missingPermissions.join(', ')}**`).catch((messageSendError) => {
                     Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                 });
             }
@@ -65,10 +81,10 @@ class MessageHandler {
             if (missingUserPermissions.length) {
                 return message.channel.createEmbed(new Embed()
                     .setColor('RED')
-                    .setTitle('Insufficient Permissions!')
-                    .setDescription(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`)
+                    .setTitle(this.getCustomLocale("userPermissions", "title") ? this.getCustomLocale("userPermissions", "title") : 'Insufficient Permissions!')
+                    .setDescription(this.getCustomLocale("userPermissions", "description") ? this.getCustomLocale("userPermissions", "description").replace("{missingUserPermissions}", missingUserPermissions.join(', ')) : `You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`)
                 ).catch((embedSendError) => {
-                    message.channel.createMessage(`You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`).catch((messageSendError) => {
+                    message.channel.createMessage(this.getCustomLocale("userPermissions", "description") ? this.getCustomLocale("userPermissions", "description").replace("{missingUserPermissions}", missingUserPermissions.join(', ')) : `You lack following permissions to use this command: **${missingUserPermissions.join(', ')}**`).catch((messageSendError) => {
                         Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                     });
                 });
@@ -77,7 +93,7 @@ class MessageHandler {
 
         /* Check if the command is restricted to the bot owner */
         if (command.owner && !this.chariot.chariotOptions.chariotConfig.owner.includes(message.author.id)) {
-            return message.channel.createMessage("Insufficient permissions!");
+            return message.channel.createMessage(this.getCustomLocale("owner") ? this.getCustomLocale("owner") : "Insufficient permissions!");
         }
 
         /* Check if an NSFW command is only used in an NSFW channel */
@@ -85,9 +101,9 @@ class MessageHandler {
             if (command.nsfw && !message.channel.nsfw) {
                 return message.channel.createEmbed(new Embed()
                     .setColor('RED')
-                    .setTitle(`Command **${command.name}** is only available in NSFW channels!`)
+                    .setTitle(this.getCustomLocale("nsfw") ? this.getCustomLocale("nsfw").replace("{command}", command.name) : `Command **${command.name}** is only available in NSFW channels!`)
                 ).catch((embedSendError) => {
-                    message.channel.createMessage(`Command **${command.name}** is only available in NSFW channels!`).catch((messageSendError) => {
+                    message.channel.createMessage(this.getCustomLocale("nsfw") ? this.getCustomLocale("nsfw").replace("{command}", command.name) : `Command **${command.name}** is only available in NSFW channels!`).catch((messageSendError) => {
                         Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                     });
                 });
@@ -112,9 +128,9 @@ class MessageHandler {
 
                 return message.channel.createEmbed(new Embed()
                     .setColor(this.chariot.chariotOptions.chariotConfig.primaryColor || 'RANDOM')
-                    .setTitle(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`)
+                    .setTitle(this.getCustomLocale("cooldown") ? this.getCustomLocale("cooldown").replace("{timeLeft}", Math.round(timeLeft)).replace("{timeLeftFormatted}".timeLeftFormatted).replace("{command}", command.name) : `Please wait **${timeLeftFormatted}** before using **${command.name}** again`)
                 ).catch((embedSendError) => {
-                    message.channel.createMessage(`Please wait **${timeLeftFormatted}** before using **${command.name}** again`).catch((messageSendError) => {
+                    message.channel.createMessage(this.getCustomLocale("cooldown") ? this.getCustomLocale("cooldown").replace("{timeLeft}", Math.round(timeLeft)).replace("{timeLeftFormatted}".timeLeftFormatted).replace("{command}", command.name) : `Please wait **${timeLeftFormatted}** before using **${command.name}** again`).catch((messageSendError) => {
                         Logger.warning('MUTED', `Can't send messages in #${message.channel.name} (${message.channel.id})`);
                     });
                 });
@@ -167,7 +183,7 @@ class MessageHandler {
                 await command.runPreconditions(message, commandArguments, this.chariot, next);
             } else {
                 next();
-            } 
+            }
         } catch (chariotCommandExecutionError) {
             Logger.error('COMMAND EXECUTION ERROR', `Command ${command.name} couldn't be executed because of: ${chariotCommandExecutionError}`);
         }
