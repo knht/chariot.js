@@ -30,7 +30,7 @@
   "homepage": "https://chariot.js.org/",
   "dependencies": {
     "chalk": "^2.4.2",
-    "eris": "^0.13.3",
+    "eris": "^0.14.0",
     "eris-additions": "^1.2.5",
     "juration": "^0.1.1",
     "readdirp": "^3.1.2"
