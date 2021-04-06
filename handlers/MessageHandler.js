@@ -11,7 +11,7 @@ class MessageHandler {
     constructor(chariot) {
         this.chariot = chariot;
         this.cooldowns = new Collection();
-        this.minimumPermissions = ['readMessages', 'sendMessages'];
+        this.minimumPermissions = ['viewChannel', 'sendMessages'];
     }
 
 
