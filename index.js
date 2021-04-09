@@ -24,6 +24,7 @@ module.exports = {
     Config: require('./structures/ChariotConfig'),
     Logger: require('./helpers/Logger'),
     Collection: require('./helpers/Collection'),
+    Extensions: require('./helpers/Extensions'),
     RichEmbed: require('./structures/ChariotEmbed'),
     Colors: require('./structures/ChariotColors'),
     Command: require('./structures/ChariotCommand'),
