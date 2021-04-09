@@ -7,15 +7,15 @@ class ChariotCommand {
     }
 
     /**
-     * Simple argument handler for getting tailed arguments with custom length and delimeters
+     * Simple argument handler for getting tailed arguments with custom length and delimiters
      * @param {string} string A string to be used 
-     * @param {string} delimeter A delimeter to split a text by 
-     * @param {number} count How often a string should be split by the delimeter before merging the contents
+     * @param {string} delimiter A delimiter to split a text by 
+     * @param {number} count How often a string should be split by the delimiter before merging the contents
      * @returns {string[]} An array of all collected arguments
      */
-    tailedArguments(string, delimeter, count) {
-        const parts  = string.split(delimeter);
-        const tail   = parts.slice(count).join(delimeter);
+    tailedArguments(string, delimiter, count) {
+        const parts  = string.split(delimiter);
+        const tail   = parts.slice(count).join(delimiter);
         const result = parts.slice(0, count);
 
         result.push(tail);
